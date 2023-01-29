@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Markus.Services
 {
+    /// <summary>
+    /// Class to work with manifest
+    /// </summary>
     internal class ManifestService
     {
 
@@ -14,6 +17,13 @@ namespace Markus.Services
         public const int MaxManifestFilenameLength = 100;
 
 
+        /// <summary>
+        /// Find manifest in folder
+        /// </summary>
+        /// <param name="manifestFolder"></param>
+        /// <returns></returns>
+        /// <exception cref="ManifestNotFoundException">No manifest in folder</exception>
+        /// <exception cref="MultipleManifestsException">Multiple project files found in folder</exception>
         public static String DetectManifestPath(string? manifestFolder)
         {
             string[] paths = Directory.GetFiles(manifestFolder).Where(x => x.EndsWith(ManifestExtension)).ToArray();
@@ -27,6 +37,12 @@ namespace Markus.Services
 
         }
 
+        /// <summary>
+        /// Finds manifest in selected folder and parses it
+        /// </summary>
+        /// <param name="manifestFolder"><see cref="Environment.CurrentDirectory"/> by default</param>
+        /// <returns></returns>
+        /// <exception cref="CorruptedManifestException"></exception>
         public static async Task<Manifest> GetManifest(string? manifestFolder = null)
         {
 
@@ -48,6 +64,13 @@ namespace Markus.Services
             return manifest;
         }
 
+        /// <summary>
+        /// Saves manifest to current project path
+        /// </summary>
+        /// <param name="manifest"></param>
+        /// <param name="overwrite"></param>
+        /// <returns></returns>
+        /// <exception cref="ManifestAlreadyExistsException"></exception>
         public static async Task SaveManifest(Manifest manifest, bool overwrite = false)
         {
 
@@ -89,6 +112,12 @@ namespace Markus.Services
             await File.WriteAllTextAsync(path, serialized);
         }
 
+
+        /// <summary>
+        /// Filters any unsupported characters from manifest name
+        /// </summary>
+        /// <param name="manifestName"></param>
+        /// <returns></returns>
         public static String PrepareManifestName (String manifestName)
         {
             string filtered = string.Concat(manifestName.Split(Path.GetInvalidFileNameChars()))

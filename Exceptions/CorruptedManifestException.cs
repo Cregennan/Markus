@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Markus.Exceptions
 {
+    /// <summary>
+    /// Is thrown when manifest file cannot be parsed 
+    /// </summary>
     internal class CorruptedManifestException : Exception
     {
     }

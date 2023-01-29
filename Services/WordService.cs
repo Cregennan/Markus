@@ -9,6 +9,10 @@ using System.Dynamic;
 
 namespace Markus.Services
 {
+
+    /// <summary>
+    /// Service to manipulate WordprocessingDocument and its content
+    /// </summary>
     internal static class WordService
     {
 
@@ -48,6 +52,7 @@ namespace Markus.Services
         
         static WordService()
         {
+            //As defined in Word's russian locale
             OrderedNumberingOrder = new NumberFormatValues[9] {
                 NumberFormatValues.Decimal,
                 NumberFormatValues.RussianLower,
@@ -85,6 +90,12 @@ namespace Markus.Services
             return current as Paragraph;
         }
 
+        /// <summary>
+        /// Adds new numbering system to document and returns it's data
+        /// </summary>
+        /// <param name="document">Current <see cref="WordprocessingDocument"/></param>
+        /// <param name="isOrdered">Is list should be ordered or not</param>
+        /// <returns></returns>
         internal static NumberingData AddDefaultLeveledNumbering(this WordprocessingDocument document, bool isOrdered)
         {
 
@@ -95,6 +106,7 @@ namespace Markus.Services
             string[] currentNumberingText = isOrdered ? OrderedNumberingText: UnorderedNumberingText;
 
 
+            //Make numbering levels with curresponding format and levelText
             var levels = currentNumberingFormat.Select((x, i) =>
                             new Level(
                                 new StartNumberingValue { Val = 1},    
@@ -109,6 +121,7 @@ namespace Markus.Services
                         );
 
 
+            //See OpenXML docs
             var abstractNumberingId = numberingPart.Numbering.Elements<AbstractNum>().Count() + 1;
             var abstractNumbering = new AbstractNum(levels) { AbstractNumberId = abstractNumberingId };
 
@@ -141,6 +154,7 @@ namespace Markus.Services
 
         }
 
+        //TODO: Not working
         internal static void ChangeLevelOrdering(this Level level, int itemLevel, bool shouldBeOrdered)
         {
     
@@ -152,6 +166,12 @@ namespace Markus.Services
 
         }
 
+        /// <summary>
+        /// Apply Emphasis effects provided by e.g. <see cref="MarkdownService.GetEmphasisEffects">GetEmphasisEffects</see>
+        /// </summary>
+        /// <param name="currentRun">Run which effect will be applied to</param>
+        /// <param name="effects">List of effects</param>
+        /// <returns></returns>
         internal static Run ApplyEmphasisEffects(this Run currentRun, object[] effects)
         {
             currentRun.RunProperties ??= new RunProperties();
@@ -179,6 +199,16 @@ namespace Markus.Services
             return currentRun;
         }
 
+
+        /// <summary>
+        /// Totally copy-pasted method. It just creates a lot of stuff to make image insertion work. 
+        /// 
+        /// You should only pass <paramref name="relationshipId"/> of relation that you made in <see cref="ImagePart">Image Part</see>[[ section of <see cref="WordprocessingDocument">document</see>
+        /// </summary>
+        /// <param name="relationshipId"></param>
+        /// <param name="Width"></param>
+        /// <param name="Height"></param>
+        /// <returns></returns>
         internal static DocumentFormat.OpenXml.Wordprocessing.Drawing MakeImage(string relationshipId, long Width, long Height)
         {
             return new DocumentFormat.OpenXml.Wordprocessing.Drawing(

@@ -13,6 +13,9 @@ using System.Net;
 
 namespace Markus.Services
 {
+    /// <summary>
+    /// Class to work with Markdown 
+    /// </summary>
     internal static class MarkdownService
     {
 
@@ -34,8 +37,17 @@ namespace Markus.Services
 
         }
 
+        /// <summary>
+        /// Get all Markdig blocks from current markdown document
+        /// </summary>
+        /// <param name="filepath">Path to markdown file</param>
+        /// <param name="recursive">Indicates to add all documents from </param>
+        /// <param name="processedPaths"></param>
+        /// <returns></returns>
         public static async Task<IEnumerable<MarkdownObject>> GetMarkdownTokens(string filepath, bool recursive = false, HashSet<string>? processedPaths = null)
         {
+
+            //This functionality is not implemented yet: recursive include_once like behaivor of markdown parser
             if (recursive && processedPaths == null)
             {
                 processedPaths = new HashSet<string>();
@@ -64,28 +76,34 @@ namespace Markus.Services
 
                 switch (block)
                 {
-                    //Заголовок
+                    
                     case HeadingBlock heading:
                         {
 
+                            //Append new paragraph and insert new run into it
                             var firstRun = new Run();
                             var paragraph = currentParagraph ?? documentBody.AppendChild(new Paragraph(firstRun));
 
-                            string headingNumber = HeadingNumerator.ForCurrentLevel(heading.Level - 1);
+                            string headingNumber = String.Empty;
+                            if ((bool)ConfigStore.Instance.Manifest.EnumerateHeadings!)
+                            {
+                                headingNumber = HeadingNumerator.ForCurrentLevel(heading.Level - 1);
+                            }
 
                             firstRun.AppendChild(new Text($"{headingNumber} "){ Space = SpaceProcessingModeValues.Preserve });
 
                             paragraph.ParagraphProperties ??= new ParagraphProperties();
                             paragraph.ParagraphProperties.AppendChild(new ParagraphStyleId { Val = $"Heading{heading.Level}" });
 
+                            //Walk through new inlines in this heading block
                             ProcessInlines(heading.Inline, ref firstRun, document);
 
                         }
                         break;
 
-                    //Абзац
                     case ParagraphBlock paragraphBlock:
                         {
+                            //Append new paragraph and run
                             var currentRun = new Run();
                             var paragraph = currentParagraph ?? documentBody.AppendChild(new Paragraph(currentRun));
 
@@ -93,12 +111,13 @@ namespace Markus.Services
                         }
                         break;
 
-                    //Горизонтальная черта
+                    //Horizontal line
                     case ThematicBreakBlock thematicBreakBlock:
                         {
                             documentBody.AppendChild(new Paragraph(
                                     new Run(),
                                     new ParagraphProperties(
+                                        //Space after line
                                         new SpacingBetweenLines { After = "360" },
                                         new ParagraphBorders(
                                             new BottomBorder { Val = BorderValues.Single, Color = "auto", Size = 12U, Space = 1U }
@@ -111,13 +130,13 @@ namespace Markus.Services
                     //Список
                     case ListBlock list:
                         {
-
                             HandleList(list, document);
                             break;
-
                         }
 
+                       
                     default:
+                        //Message will be written if block is not implemented and app is in debug
                         ConsoleService.DebugWarning($"Блок {block} не реализован");
                         break;
 
@@ -126,7 +145,14 @@ namespace Markus.Services
 
         }
 
-        public static void ProcessInlines(IEnumerable<Inline>? children, ref Run currentRun, WordprocessingDocument document, object[] currentInlineProperties = null)
+        /// <summary>
+        /// Process all inlines. If instance of inline has child inlines itself, function will be recursively called for all of them.
+        /// </summary>
+        /// <param name="children">Collection of inlines, for example: children of block element</param>
+        /// <param name="currentRun"></param>
+        /// <param name="document">Current Wordprocessing document</param>
+        /// <param name="currentInlineProperties">Run modifiers such as <see cref="Bold"> and </see><seealso cref="Italic"/>. Effects will be applied to selected run</param>
+        private static void ProcessInlines(IEnumerable<Inline>? children, ref Run currentRun, WordprocessingDocument document, object[] currentInlineProperties = null)
         {
 
             foreach (Inline child in children)
@@ -136,7 +162,8 @@ namespace Markus.Services
                     case LiteralInline literal:
                         {
                             
-                            currentRun.ApplyEmphasisEffects(currentInlineProperties)
+                            currentRun
+                                .ApplyEmphasisEffects(currentInlineProperties) //Append bold and italic styles
                                 .AppendChild(new Text(literal.ToString()) { Space = SpaceProcessingModeValues.Preserve });
                             break;
                         }
@@ -146,7 +173,7 @@ namespace Markus.Services
                             HandleEmphasis(emphasis, ref currentRun, document, currentInlineProperties);
                             break;
                         }
-
+                        //LinkInline may represend simple link, image or linkreference
                     case LinkInline link:
                         {
 
@@ -170,6 +197,7 @@ namespace Markus.Services
 
                             currentRun.AppendChild(new Text(code.Content));
 
+                            //Apply styles for custom paragraph type
                             currentRun.RunProperties ??= new RunProperties();
                             currentRun.RunProperties.AppendChild(new RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" });
                             currentRun.RunProperties.AppendChild(new FontSize { Val = "24" });
@@ -194,6 +222,7 @@ namespace Markus.Services
 
             var documentBody = document.MainDocumentPart.Document.Body;
 
+            //Make level numbering, for example: all "*" for unordered lists or "1. a. iii." for ordered
             WordService.NumberingData numberingData = document.AddDefaultLeveledNumbering(list.IsOrdered);
 
             int currentNumberingIndex = numberingData.NumberingIndex;
@@ -202,18 +231,20 @@ namespace Markus.Services
 
                 bool isItemOrdered = child.Block.Order != 0;
 
-                //If order of ListItemBlock differs from order of whole ListBlock (
+                //If order of ListItemBlock differs from order of whole ListBlock 
+                //TODO: Fix this, in-flight change of order is not working
                 if (!isItemOrdered == list.IsOrdered)
                     numberingData.Levels.ElementAt(child.Level).ChangeLevelOrdering(child.Level, isItemOrdered);
                 
                 Paragraph p = documentBody.AppendChild(new Paragraph(
+                        //See OpenXML Word documentation for numering docs
                         new NumberingProperties
                         {
+                            
                             NumberingId = new NumberingId { Val = currentNumberingIndex },
                             NumberingLevelReference = new NumberingLevelReference { Val = child.Level }
                         }
                     ));
-
                 p.ParagraphProperties ??= new ParagraphProperties();
                 p.ParagraphProperties.AppendChild(new ParagraphStyleId { Val = "ListParagraph" });
 
@@ -228,11 +259,6 @@ namespace Markus.Services
 
         }
 
-        /// <summary>
-        /// Returns ListItemBlock children of ListBlock in dfs order with their corresponding levels in tree.
-        /// </summary>
-        /// <returns></returns>
-       
 
         public static void HandleBasicLink(LinkInline link, ref Run currentRun, WordprocessingDocument document)
         {
@@ -280,29 +306,38 @@ namespace Markus.Services
         public static void HandleEmphasis(EmphasisInline emphasis, ref Run currentRun, WordprocessingDocument document, object[] existingEffects)
         {
 
+            //Paragraph of current run
             Paragraph currentParagraph = currentRun.GetParentParagraph();
 
+            //Effects (modifiers) such as Bold, Italic
             object[] currentEffects = GetEmphasisEffects(emphasis.DelimiterCount, emphasis.DelimiterChar);
+
+            //Run in WordprocessingDocument cannot contain another run. 
+            //Because of that, nested effects (bold in italic) should be broken down into series of runs
             foreach(Inline inline in emphasis)
             {
-
+                //Insert new run after current and set "pointer to current run" to it
                 currentRun = currentParagraph.InsertAfter(new Run(), currentRun);
 
+                //Merge effects of current emphasis with effects of previous emphasises (higher in markdown tree)
                 object[] mergedEffects = (existingEffects ??= new object[] { }).Union(currentEffects ?? new object[] { }).ToArray();
 
+                //Process this inline with old and new effects
                 ProcessInlines(new[] { inline }, ref currentRun, document, existingEffects.Union(currentEffects ?? new object[] { }).ToArray());
 
             }
+            //Add new run after the last to cancel effects of current emphasis
             currentRun = currentParagraph.InsertAfter(new Run(), currentRun);
         }
 
         
-
+        //Process link as image
         public static void HandleImageLink(LinkInline link, ref Run previousRun, WordprocessingDocument document)
         {
             MainDocumentPart mainPart = document.MainDocumentPart;
             ImagePart imagePart = mainPart.AddImagePart(ImagePartType.Jpeg);
 
+            //See OpenXML documentation
             Paragraph currentParagraph = previousRun.GetParentParagraph().InsertAfterSelf(new Paragraph());
             currentParagraph.ParagraphProperties ??= new ParagraphProperties();
             currentParagraph.ParagraphProperties.AppendChild(new Justification { Val = JustificationValues.Center });
@@ -315,20 +350,24 @@ namespace Markus.Services
             long Height = 0;
             bool processed = true;
 
+            //Check if link to image is URL to internet resource
             imageData = Utility.TryGetJpegStreamExternal(path, out string message, out Height,out Width);
             processed = imageData is not null;
 
+            //Check if link to image is to file in current project directory
             if (!processed)
             {
                 imageData = Utility.TryGetJpegStreamLocal(Path.Combine(Environment.CurrentDirectory, path), out string message2, out Height, out Width);
 
                 processed = imageData is not null;
             }
+            //Check if link is absolute path to image on disk
             if (!processed)
             {
                 imageData = Utility.TryGetJpegStreamLocal(path, out string message1, out Height, out Width);
                 processed = imageData is not null;
             }
+            //Fail
             if (!processed)
             {
                 currentRun.AppendChild(new Text($"Не удалось найти изображение по адресу {path}"));
@@ -338,12 +377,14 @@ namespace Markus.Services
             imageData.Position = 0;
             imagePart.FeedData(imageData);
 
+            //Calc new sizes of image for it to fit in margins of page
             WordService.CalcFitImageSizes(Width, Height, document, out long newWidth, out long newHeight);
 
+            //Insert image into ImageDefinitions part, see OpenXML docs
             var drawing = WordService.MakeImage(mainPart.GetIdOfPart(imagePart), newWidth, newHeight);
             currentRun.AppendChild(drawing);
 
-
+            //Apply some styles to paragraph of caption
             Paragraph captionParagraph = currentParagraph.InsertAfterSelf(new Paragraph());
             captionParagraph.ParagraphProperties ??= new ParagraphProperties();
             captionParagraph.ParagraphProperties.AppendChild(new ParagraphStyleId { Val = "Caption" });
@@ -357,10 +398,12 @@ namespace Markus.Services
                             new NoProof() { Val = true }
                             ),
                         new Text(
-                            Ticker.Tick("Pictures").ToString()
+                            //Get current image number in document
+                            Ticker.Up("Pictures").ToString()
                             )
                         )
                 )
+            //Instruction is rule how to make link reference to this image
             { Instruction = @"SEQ Рисунок \* ARABIC" });
             captionParagraph.AppendChild(new Run(new Text(" - ") { Space = SpaceProcessingModeValues.Preserve }));
             captionParagraph.AppendChild(new Run(new Text(link.FirstChild.ToString())));
@@ -370,11 +413,14 @@ namespace Markus.Services
 
 
         }
+
+        //Parse markdown characters (e.g. **, *)
         public static object[] GetEmphasisEffects(int count, char delimiter)
         {
 
             bool isItalic = (count == 1) && (delimiter == '*' || delimiter == '_');
             bool isBold = (count == 2) && (delimiter == '*' || delimiter == '_');
+            //TODO: Implement additional emphasis effects
             bool isStrikeThrough = (count == 1) && (delimiter == '~');
 
             List<object> effects = new List<object>();
@@ -386,18 +432,19 @@ namespace Markus.Services
         }
         internal static IEnumerable<LeveledListItem> GetLeveledChildren(this ListBlock listBlock)
         {
-
+            //Walk through every children of list block
             IEnumerable<LeveledListItem> dfs(ListBlock list, int level)
             {
                 foreach (ListItemBlock block in list)
                 {
                     yield return new LeveledListItem { Level = level, Block = block };
 
+                    //If list item contains nested list items
                     foreach (var blockChild in block)
                     {
                         if (blockChild is ListBlock)
                         {
-                            //Unfortunate
+                            //C# does not have "yield foreach return X"
                             foreach (var item in dfs(blockChild as ListBlock, level + 1))
                             {
                                 yield return item;

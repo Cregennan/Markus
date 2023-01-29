@@ -21,11 +21,11 @@ namespace Markus.Commands
         [Option('q', "quiet", Required = false, Default = false, HelpText = "Тихая работа, без вывода большей части текста")]
         public bool _quiet { get; set; }
 
-
+        /// <inheritdoc/>
         public async Task Execute()
         {
 
-            
+            //Name provided by user should be filtered from any NTFS unsupported characters.
             string entryName = ManifestService.PrepareManifestName(_name);
             if (!_quiet)
             {
@@ -39,6 +39,7 @@ namespace Markus.Commands
             {
                 await ManifestService.SaveManifest(manifest, this._force);
 
+                //Copy example files into new project folder
                 Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "images"));
                 File.Copy(
                     Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Example", "alexanderPushnoy.jpg"),
@@ -63,9 +64,6 @@ namespace Markus.Commands
             {
                 ConsoleService.ShowError("Не удалось создать проект");
             }
-                
-
-
         }
     }
 }

@@ -8,6 +8,9 @@ using SixLabors.ImageSharp.Formats;
 
 namespace Markus.Services
 {
+    /// <summary>
+    /// Class contains methods to work with units, images etc.
+    /// </summary>
     internal static class Utility
     {
 

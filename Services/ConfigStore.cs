@@ -1,16 +1,20 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Markus.Configmodels;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
 namespace Markus.Services
 {
+    /// <summary>
+    /// Storage of data needed for app to run. For example, current parsed manifest or path to current theme
+    /// </summary>
     internal class ConfigStore
     {
 
         public Manifest Manifest { get; private set; }
 
-        public String CurrentTheme {get; private set;}
+        public String CurrentTheme { get; private set; }
 
         private ConfigStore(Manifest manifest, String themePath)
         {

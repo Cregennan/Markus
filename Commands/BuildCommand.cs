@@ -1,14 +1,11 @@
 ﻿using CommandLine;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Validation;
-using DocumentFormat.OpenXml.Wordprocessing;
+using Markdig.Syntax;
 using Markus.Configmodels;
 using Markus.Exceptions;
 using Markus.Services;
-using Markdig.Syntax;
 using Newtonsoft.Json;
 using Spectre.Console;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace Markus.Commands
@@ -21,10 +18,12 @@ namespace Markus.Commands
         [Option('q', "quiet", Required = false, Default = false, HelpText = "Тихая работа, без вывода большей части текста")]
         public bool _quiet { get; set; }
 
-
+        ///<inheritdoc />
         public async Task Execute()
         {
 
+            //TODO: Extract reading of template file into another method
+            
             try
             {
                 if (!_quiet){
@@ -38,48 +37,60 @@ namespace Markus.Commands
                 ConsoleService.ShowSuccess($"Собираем проект {manifest.ProjectName}...");
 
 
+                //TODO: Make --project parameter to manually select path where app will be executed
                 string entrypointPath = Path.Combine(Environment.CurrentDirectory, manifest.Entrypoint);
-               
 
-                string projectThemePath = Path.Combine(Environment.CurrentDirectory, manifest.Template);
-                string executableThemePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", manifest.Template);
+                string templateFromProjectPath = Path.Combine(Environment.CurrentDirectory, manifest.Template);
+                string templateFromApplicationPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", manifest.Template);
 
-                string templatePath = String.Empty;
+                string selectedTemplatePath = String.Empty;
 
-                if (File.Exists(projectThemePath))
+                if (File.Exists(templateFromProjectPath))
                 {
-                    templatePath = projectThemePath;
+                    selectedTemplatePath = templateFromProjectPath;
                     if(!_quiet)
                         AnsiConsole.MarkupLineInterpolated($"Используется пользовательский шаблон {manifest.Template}");
                 }
-                else if (File.Exists(executableThemePath))
+                else if (File.Exists(templateFromApplicationPath))
                 {
-                    templatePath = executableThemePath;
+                    selectedTemplatePath = templateFromApplicationPath;
                     if (!_quiet)
                         AnsiConsole.MarkupLineInterpolated($"Используется системный шаблон {manifest.Template}");
                 }
                 else
-                {
+                {   
+                    //Get themes configuration
                     Themes themes = JsonConvert.DeserializeObject<Themes>(
                         File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", "themeDefinitions.json"))
                         )!;
 
+                    
                     Theme? theme = themes.Definitions.Where(x => x.Default).FirstOrDefault();
+
+                    //No theme in theme definition is pointed as "default" 
+                    //Can happen if some developer forgets to set one of themes to "default" or in result of user actions
+                    //TODO: Pack all content of Themes folder in archive (zip maybe). This will require to find another way to insert template into WordprocessingDocument
                     if (theme is null)
                     {
-                        ConsoleService.ShowError("Не удалось найти файл шаблона");
-                        AnsiConsole.MarkupLineInterpolated($"Попробуйте проверить файлы или создать новый проект");
+                        ConsoleService.ShowError("Ошибка в параметрах приложения");
+                        AnsiConsole.MarkupLineInterpolated($"Не найден шаблон по умолчанию, попробуйте выбрать другой шаблон");
                         return;
                     }
-                    templatePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", theme.File + ".md");
+                    selectedTemplatePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", theme.File + ".md");
                     if (!_quiet)
+                    {
+                        ConsoleService.ShowWarning("Не удалось найти файл шаблона");
                         AnsiConsole.MarkupLineInterpolated($"Используется системный шаблон по умолчанию: {theme.OutputText}");
+                    }
+                        
 
                 }
-                ConfigStore.Setup(manifest, templatePath);
+
+                
+                ConfigStore.Setup(manifest, selectedTemplatePath);
                 IEnumerable<MarkdownObject> tokens = await MarkdownService.GetMarkdownTokens(entrypointPath + ".md");
 
-                using (var document = WordprocessingDocument.CreateFromTemplate(templatePath))
+                using (var document = WordprocessingDocument.CreateFromTemplate(selectedTemplatePath))
                 {
 
                     MarkdownService.ProcessBlocks(tokens, document);

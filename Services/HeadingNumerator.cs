@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Markus.Services
 {
+
+    /// <summary>
+    /// Class that makes heading enumeration (e.g:  1.1.2. Heading)
+    /// </summary>
     internal static class HeadingNumerator
     {
 
@@ -13,6 +17,11 @@ namespace Markus.Services
 
         private static int level = 0;
 
+        /// <summary>
+        /// Numeration for current heading
+        /// </summary>
+        /// <param name="currentLevel">Level of current heading (starts with 0)</param>
+        /// <returns></returns>
         public static String ForCurrentLevel(int currentLevel)
         {
             int dl = currentLevel - level;
