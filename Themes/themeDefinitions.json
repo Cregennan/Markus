@@ -1,0 +1,9 @@
+{
+  "definitions": [
+    {
+      "file": "gost7-32-2017",
+      "outputText": "ГОСТ 7.32–2017",
+      "defaultTheme": true
+    }
+  ]
+}

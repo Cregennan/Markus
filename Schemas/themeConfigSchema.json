@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "description": "Описание шаблонов проекта",
+  "type": "object",
+  "properties": {
+    "definitions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/themeDefinition"}
+    }
+  },
+  "$defs": {
+    "themeDefinition": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Название файла шаблона",
+          "minLength": 4
+        },
+        "outputText": {
+          "type": "string",
+          "description": "Описание файла шаблона",
+          "minLength": 5
+        },
+        "defaultTheme": {
+          "type": "boolean",
+          "description": "Шаблон по умолчанию",
+          "default": false
+        }
+      },
+      "required" : ["file","outputText"]
+    }
+  }
+}

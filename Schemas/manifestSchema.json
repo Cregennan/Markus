@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "description": "Application project manifest file",
+  "type": "object",
+  "properties": {
+    "entrypoint": {
+      "description": "Входной файл приложения",
+      "type": "string",
+      "minLength": 1
+    },
+    "projectName": {
+      "description": "Название проекта",
+      "type": "string",
+      "minLength": 6
+    },
+    "template": {
+      "type": "string",
+      "minLength": 4,
+      "description": "Название файла с шаблоном оформления"
+    },
+    "recursive": {
+      "type": "boolean",
+      "default": false,
+      "description": "Рекурсивное добавление других файлов Markdown в рабочий (по умолчанию - false) (не поддерживается на данный момент)"
+    },
+    "enumerateHeadings": {
+      "type": "boolean",
+      "default": true,
+      "description": "Нумеровать заголовки (кроме специальных, вроде \"Приложение\", \"Введение\" и т.д."
+    }
+
+  },
+  "required": [
+    "entrypoint",
+    "projectName"
+  ]
+}
