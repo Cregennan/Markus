@@ -1,8 +1,6 @@
-﻿using Markus.Commands;
+﻿using CommandLine;
+using Markus.Commands;
 using System.Reflection;
-using CommandLine;
-using Markus.Configmodels;
-using Newtonsoft.Json;
 
 namespace Markus
 {

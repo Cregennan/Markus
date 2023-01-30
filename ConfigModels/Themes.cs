@@ -1,11 +1,10 @@
-﻿namespace Markus.Configmodels
-{
-    using System;
-    using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Globalization;
 
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
+namespace Markus.Configmodels
+{
+
 
     /// <summary>
     /// Описание шаблонов проекта

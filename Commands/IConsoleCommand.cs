@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Markus.Commands
+﻿namespace Markus.Commands
 {
     /// <summary>
     /// Any command in this cli app should implement this interface. 

@@ -8,7 +8,7 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>markus</AssemblyName>
     <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
-    <PublishReadyToRun>false</PublishReadyToRun>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>
@@ -50,10 +50,10 @@
 
   <ItemGroup>
     <None Update="Schemas\manifestSchema.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Schemas\themeConfigSchema.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

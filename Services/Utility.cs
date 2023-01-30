@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
+﻿using SixLabors.ImageSharp;
 
 namespace Markus.Services
 {
@@ -13,6 +7,14 @@ namespace Markus.Services
     /// </summary>
     internal static class Utility
     {
+
+        internal static String ApplicationPath => AppContext.BaseDirectory;
+        //{
+        //    get
+        //    {
+        //        return AppContext.BaseDirectory;//Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? Assembly.GetExecutingAssembly()?.Location ?? Assembly.GetCallingAssembly().Location)!;
+        //    }
+        //}
 
         internal static void CalcSizeInEmu(Image image, out long widthEmu, out long heightEmu)
         {

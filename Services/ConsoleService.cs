@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Markus.Configmodels;
+﻿using Markus.Configmodels;
 using Newtonsoft.Json;
 using Spectre.Console;
 
@@ -111,7 +105,7 @@ namespace Markus.Services
             //Рекурсия или нет
             manifest.Recursive = false; //не реализовано
 
-            string themedefPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", "themeDefinitions.json");
+            string themedefPath = Path.Combine(Utility.ApplicationPath, "Themes", "themeDefinitions.json");
             string themedefText = File.ReadAllText(themedefPath);
             Themes themes = JsonConvert.DeserializeObject<Themes>(themedefText);
             List<ThemeData> themeData = themes.Definitions.Select(x =>
@@ -119,7 +113,7 @@ namespace Markus.Services
                 return new ThemeData
                 {
                     Displayname = x.OutputText,
-                    Fullpath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", $"{x.File}.dotm")
+                    Fullpath = Path.Combine(Utility.ApplicationPath, "Themes", $"{x.File}.dotm")
                 };
             }).ToList();
             string[] files = System.IO.Directory.GetFiles(Environment.CurrentDirectory, "*.dotm");

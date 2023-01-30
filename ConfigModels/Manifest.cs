@@ -1,11 +1,8 @@
-﻿namespace Markus.Configmodels
+﻿using Newtonsoft.Json;
+
+namespace Markus.Configmodels
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
+
 
     /// <summary>
     /// Application project manifest file
