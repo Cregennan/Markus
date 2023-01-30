@@ -34,7 +34,7 @@ namespace Markus.Commands
                 Manifest manifest = await ManifestService.GetManifest();
 
                 if (!_quiet)
-                ConsoleService.ShowSuccess($"Собираем проект {manifest.ProjectName}...");
+                    ConsoleService.ShowSuccess($"Собираем проект {manifest.ProjectName}...");
 
 
                 //TODO: Make --project parameter to manually select path where app will be executed
@@ -98,7 +98,7 @@ namespace Markus.Commands
 
                 }
                 if(!_quiet)
-                ConsoleService.ShowSuccess("Готово!");
+                    ConsoleService.ShowSuccess("Готово!");
 
             }
             catch (ManifestNotFoundException)

@@ -14,8 +14,8 @@ namespace Markus
 
             var commands = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IConsoleCommand))).ToArray();
 
-            var result = CommandLine.Parser.Default.ParseArguments(args, commands).WithParsedAsync(
-                    async (type) => await (type as IConsoleCommand)?.Execute()
+            var result = await CommandLine.Parser.Default.ParseArguments(args, commands).WithParsedAsync(
+                    (type) => (type as IConsoleCommand)?.Execute()
                 );
         }
     }

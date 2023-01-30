@@ -22,7 +22,7 @@ namespace Markus.Services
             this.CurrentTheme = themePath;
         }
 
-        public static ConfigStore Instance { get; } = null;
+        public static ConfigStore Instance { get; private set; } = null;
 
         public static ConfigStore Setup(Manifest manifest, String themePath)
         {
@@ -30,7 +30,8 @@ namespace Markus.Services
             {
                 return Instance;
             }
-            return new ConfigStore(manifest, themePath);
+            Instance = new ConfigStore(manifest, themePath);
+            return Instance;
         }
 
 
