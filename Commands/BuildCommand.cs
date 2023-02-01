@@ -6,7 +6,6 @@ using Markus.Exceptions;
 using Markus.Services;
 using Newtonsoft.Json;
 using Spectre.Console;
-using System.Reflection;
 
 namespace Markus.Commands
 {
@@ -41,7 +40,7 @@ namespace Markus.Commands
                 string entrypointPath = Path.Combine(Environment.CurrentDirectory, manifest.Entrypoint);
 
                 string templateFromProjectPath = Path.Combine(Environment.CurrentDirectory, manifest.Template);
-                string templateFromApplicationPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", manifest.Template);
+                string templateFromApplicationPath = Path.Combine(Utility.ApplicationPath, "Themes", manifest.Template);
 
                 string selectedTemplatePath = String.Empty;
 
@@ -61,7 +60,7 @@ namespace Markus.Commands
                 {   
                     //Get themes configuration
                     Themes themes = JsonConvert.DeserializeObject<Themes>(
-                        File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", "themeDefinitions.json"))
+                        File.ReadAllText(Path.Combine(Utility.ApplicationPath, "Themes", "themeDefinitions.json"))
                         )!;
 
                     
@@ -76,7 +75,7 @@ namespace Markus.Commands
                         AnsiConsole.MarkupLineInterpolated($"Не найден шаблон по умолчанию, попробуйте выбрать другой шаблон");
                         return;
                     }
-                    selectedTemplatePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Themes", theme.File + ".md");
+                    selectedTemplatePath = Path.Combine(Utility.ApplicationPath, "Themes", theme.File + ".dotm");
                     if (!_quiet)
                     {
                         ConsoleService.ShowWarning("Не удалось найти файл шаблона");

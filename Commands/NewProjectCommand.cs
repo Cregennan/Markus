@@ -3,7 +3,6 @@ using Markus.Configmodels;
 using Markus.Exceptions;
 using Markus.Services;
 using Spectre.Console;
-using System.Reflection;
 
 namespace Markus.Commands
 {
@@ -42,12 +41,12 @@ namespace Markus.Commands
                 //Copy example files into new project folder
                 Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "images"));
                 File.Copy(
-                    Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Example", "alexanderPushnoy.jpg"),
+                    Path.Combine(Utility.ApplicationPath, "Example", "alexanderPushnoy.jpg"),
                     Path.Combine(Environment.CurrentDirectory, "images", "alexanderPushnoy.jpg")
                     );
 
                 File.Copy(
-                    Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Example", "example.md"),
+                    Path.Combine(Utility.ApplicationPath, "Example", "example.md"),
                     Path.Combine(Environment.CurrentDirectory, $"{manifest.Entrypoint}.md")
                 );
                 

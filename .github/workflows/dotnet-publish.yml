@@ -1,0 +1,42 @@
+---
+name: "build"
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - "master"
+
+jobs:
+  build:
+    name: "Publish dotnet app"
+    runs-on: "windows-latest"
+    strategy:
+      matrix:
+        dotnet-version: ['7.0.x']
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build solutiona
+        run: dotnet build --configuration Release --no-restore
+      - name: Publish solution
+        run: dotnet publish -c release -r win10-x64 --self-contained /p:publishsinglefile=true -o "./output/"
+      - uses: vimtor/action-zip@v1
+        with:
+          files: output/
+          dest: markus-release.zip
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Markus release"
+          files: |
+            markus-release.zip

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Markus.Services
+﻿namespace Markus.Services
 {
     /// <summary>
     /// Class that implements Ticker - any number of independent counters that can be increased or decreased by one.

@@ -2,14 +2,8 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Markdig;
-using Markdig.Parsers;
-using Markdig.Renderers.Html;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
-using Markus.Services;
-using System.Collections;
-using Markdig.Extensions.AutoIdentifiers;
-using System.Net;
 
 namespace Markus.Services
 {

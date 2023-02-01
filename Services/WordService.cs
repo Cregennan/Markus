@@ -1,11 +1,9 @@
 ﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Drawing = DocumentFormat.OpenXml.Drawing;
-using DrawingWordprocessing = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using DrawingPictures = DocumentFormat.OpenXml.Drawing.Pictures;
-using System.Dynamic;
+using DrawingWordprocessing = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 
 namespace Markus.Services
 {

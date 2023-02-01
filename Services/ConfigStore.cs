@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Markus.Configmodels;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
+﻿using Markus.Configmodels;
 
 namespace Markus.Services
 {

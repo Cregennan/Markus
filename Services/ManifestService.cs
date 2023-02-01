@@ -1,7 +1,6 @@
 ﻿using Markus.Configmodels;
 using Markus.Exceptions;
 using Newtonsoft.Json;
-using System.Text;
 
 namespace Markus.Services
 {
