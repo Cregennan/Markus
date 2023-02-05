@@ -4,9 +4,7 @@ name: "build"
 on:
   push:
     tags:
-      - v*
-    branches:
-      - master
+      - 'v*'
 
 jobs:
   build:
@@ -32,11 +30,8 @@ jobs:
         with:
           files: output/
           dest: markus-release.zip
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.RELEASE_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: false
-          title: "Markus ${{github.ref_name}}"
-          files: |
-            markus-release.zip
+      - name: Add artifacts to release
+        uses: actions/upload-artifact@v2
+        with: 
+          name: assets-for-download
+          path: downloads
