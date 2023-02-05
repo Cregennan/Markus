@@ -4,9 +4,7 @@ name: "build"
 on:
   push:
     tags:
-      - "v*"
-    branches:
-      - "master"
+      - 'v*'
 
 jobs:
   build:
@@ -24,7 +22,7 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Install dependencies
         run: dotnet restore
-      - name: Build solutiona
+      - name: Build solution
         run: dotnet build --configuration Release --no-restore
       - name: Publish solution
         run: dotnet publish -c release -r win10-x64 --self-contained /p:publishsinglefile=true -o "./output/"
@@ -32,11 +30,8 @@ jobs:
         with:
           files: output/
           dest: markus-release.zip
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: false
-          title: "Markus release"
-          files: |
-            markus-release.zip
+      - name: Add artifacts to release
+        uses: actions/upload-artifact@v2
+        with: 
+          name: assets-for-download
+          path: downloads
