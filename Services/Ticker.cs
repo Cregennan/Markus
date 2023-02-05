@@ -28,6 +28,7 @@
             return data[key];
         }
 
+
         /// <summary>
         /// Increases number stored in counter by one and returns it
         /// </summary>
