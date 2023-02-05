@@ -26,12 +26,12 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       - name: Publish solution
         run: dotnet publish -c release -r win10-x64 --self-contained /p:publishsinglefile=true -o "./output/"
-      - uses: vimtor/action-zip@v1
-        with:
-          files: output/
-          dest: markus-release.zip
+      # - uses: vimtor/action-zip@v1
+      #   with:
+      #     files: output/
+      #     dest: markus-release.zip
       - name: Add artifacts to release
         uses: actions/upload-artifact@v2
         with: 
-          name: assets-for-download
-          path: downloads
+          name: markus.win10-x64
+          path: output
