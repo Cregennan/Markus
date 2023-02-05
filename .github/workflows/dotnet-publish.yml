@@ -4,9 +4,9 @@ name: "build"
 on:
   push:
     tags:
-      - "v*"
+      - v*
     branches:
-      - "master"
+      - master
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Install dependencies
         run: dotnet restore
-      - name: Build solutiona
+      - name: Build solution
         run: dotnet build --configuration Release --no-restore
       - name: Publish solution
         run: dotnet publish -c release -r win10-x64 --self-contained /p:publishsinglefile=true -o "./output/"
@@ -34,9 +34,9 @@ jobs:
           dest: markus-release.zip
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: "${{ secrets.RELEASE_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: false
-          title: "Markus release"
+          title: "Markus ${{github.ref_name}}"
           files: |
             markus-release.zip
