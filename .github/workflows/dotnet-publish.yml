@@ -10,6 +10,9 @@ jobs:
   build:
     name: Создание релиза
     runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: ['7.0.x']
     steps:
         uses: actions/checkout@v2
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
