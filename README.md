@@ -1,7 +1,6 @@
 <a name="document_top"></a>
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
+![build](https://github.com/cregennan/markus/actions/workflows/dotnet-publish.yml/badge.svg)
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
