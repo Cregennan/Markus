@@ -20,6 +20,10 @@ namespace Markus.Commands
         [Option('q', "quiet", Required = false, Default = false, HelpText = "Тихая работа, без вывода большей части текста")]
         public bool _quiet { get; set; }
 
+        [Option("path", Default = null, Required = false, HelpText = "Путь к папке проекта")]
+        public string? _path { get; set; }
+
+
         /// <inheritdoc/>
         public async Task Execute()
         {
@@ -36,18 +40,22 @@ namespace Markus.Commands
 
             try
             {
-                await ManifestService.SaveManifest(manifest, this._force);
+                string directoryPath = _path == null ? Environment.CurrentDirectory : Path.GetFullPath( _path );
+
+                await ManifestService.SaveManifest(manifest, directoryPath, _force);
+
+                
 
                 //Copy example files into new project folder
-                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "images"));
+                Directory.CreateDirectory(Path.Combine(directoryPath, "images"));
                 File.Copy(
                     Path.Combine(Utility.ApplicationPath, "Example", "alexanderPushnoy.jpg"),
-                    Path.Combine(Environment.CurrentDirectory, "images", "alexanderPushnoy.jpg")
+                    Path.Combine(directoryPath, "images", "alexanderPushnoy.jpg")
                     );
 
                 File.Copy(
                     Path.Combine(Utility.ApplicationPath, "Example", "example.md"),
-                    Path.Combine(Environment.CurrentDirectory, $"{manifest.Entrypoint}.md")
+                    Path.Combine(directoryPath, $"{manifest.Entrypoint}.md")
                 );
                 
                 if (!_quiet)

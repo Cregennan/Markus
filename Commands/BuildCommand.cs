@@ -17,6 +17,9 @@ namespace Markus.Commands
         [Option('q', "quiet", Required = false, Default = false, HelpText = "Тихая работа, без вывода большей части текста")]
         public bool _quiet { get; set; }
 
+        [Option("path", Default = null, Required = false, HelpText = "Путь к папке проекта")]
+        public string? _path { get; set; }
+
         ///<inheritdoc />
         public async Task Execute()
         {
@@ -28,17 +31,19 @@ namespace Markus.Commands
                 if (!_quiet){
                     ConsoleService.Greeting();
                 }
-                    
+
                 //Получение манифеста
-                Manifest manifest = await ManifestService.GetManifest();
+
+                string directoryPath = _path == null ? Environment.CurrentDirectory : Path.GetFullPath(_path);
+
+                Manifest manifest = await ManifestService.GetManifest(directoryPath);
 
                 if (!_quiet)
                     ConsoleService.ShowSuccess($"Собираем проект {manifest.ProjectName}...");
 
 
                 //TODO: Make --project parameter to manually select path where app will be executed
-                string entrypointPath = Path.Combine(Environment.CurrentDirectory, manifest.Entrypoint);
-
+                string entrypointPath = Path.Combine(directoryPath, manifest.Entrypoint);
                 string templateFromProjectPath = Path.Combine(Environment.CurrentDirectory, manifest.Template);
                 string templateFromApplicationPath = Path.Combine(Utility.ApplicationPath, "Themes", manifest.Template);
 
