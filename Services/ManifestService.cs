@@ -9,9 +9,7 @@ namespace Markus.Services
     /// </summary>
     internal class ManifestService
     {
-
-
-        public const String ManifestExtension = ".gdproj";
+        public const String ManifestExtension = ".mks";
         public const String DefaultManifestName = "Project";
         public const int MaxManifestFilenameLength = 100;
 
@@ -25,29 +23,32 @@ namespace Markus.Services
         /// <exception cref="MultipleManifestsException">Multiple project files found in folder</exception>
         public static String DetectManifestPath(string? manifestFolder)
         {
-            string[] paths = Directory.GetFiles(manifestFolder).Where(x => x.EndsWith(ManifestExtension)).ToArray();
-
-            return paths.Length switch
+            ConsoleService.DebugWarning(manifestFolder);
+            if (Directory.Exists(manifestFolder))
             {
-                0 => throw new ManifestNotFoundException(),
-                1 => paths[0],
-                _ => throw new MultipleManifestsException(),
-            };
+                string[] paths = Directory.GetFiles(manifestFolder).Where(x => x.EndsWith(ManifestExtension)).ToArray();
+
+                return paths.Length switch
+                {
+                    0 => throw new ManifestNotFoundException(),
+                    1 => paths[0],
+                    _ => throw new MultipleManifestsException(),
+                };
+            }
+            throw new ManifestNotFoundException();
+            
 
         }
-
+        
         /// <summary>
         /// Finds manifest in selected folder and parses it
         /// </summary>
-        /// <param name="manifestFolder"><see cref="Environment.CurrentDirectory"/> by default</param>
+        /// <param name="directoryPath"><see cref="Environment.CurrentDirectory"/> by default</param>
         /// <returns></returns>
         /// <exception cref="CorruptedManifestException"></exception>
-        public static async Task<Manifest> GetManifest(string? manifestFolder = null)
-        {
-
-            manifestFolder ??= Environment.CurrentDirectory;
-
-            String manifestPath = DetectManifestPath(manifestFolder);
+        public static async Task<Manifest> GetManifest(string? directoryPath = null)
+        {   
+            String manifestPath = DetectManifestPath(directoryPath);
             
             Manifest? manifest = null;
             String text = await File.ReadAllTextAsync(manifestPath);
@@ -70,26 +71,26 @@ namespace Markus.Services
         /// <param name="overwrite"></param>
         /// <returns></returns>
         /// <exception cref="ManifestAlreadyExistsException"></exception>
-        public static async Task SaveManifest(Manifest manifest, bool overwrite = false)
+        public static async Task SaveManifest(Manifest manifest, string directoryPath, bool overwrite = false)
         {
+            
+            String serializedManifest = JsonConvert.SerializeObject(manifest);
 
-            String serialized = JsonConvert.SerializeObject(manifest);
-
-            String cleanManifestName = PrepareManifestName(manifest.ProjectName);
-            if (cleanManifestName.Length == 0)
+            String cleanedManifestName = PrepareManifestName(manifest.ProjectName);
+            if (cleanedManifestName.Length == 0)
             {
-                cleanManifestName = DefaultManifestName;
+                cleanedManifestName = DefaultManifestName;
             }
 
-            String path = Path.Combine(Environment.CurrentDirectory, cleanManifestName + ManifestExtension);
-            
+            string manifestFilePath = Path.Combine(directoryPath, cleanedManifestName + ManifestExtension);
+
+            ConsoleService.DebugWarning("Путь создания манифеста: " + manifestFilePath);
 
             bool projectExists = true;
             string existingPath = String.Empty;
             try
             {
-                existingPath = DetectManifestPath(Environment.CurrentDirectory);
-                
+                existingPath = DetectManifestPath(directoryPath);
             }
             catch (ManifestNotFoundException)
             {
@@ -108,7 +109,8 @@ namespace Markus.Services
                 }
             }
 
-            await File.WriteAllTextAsync(path, serialized);
+            Directory.CreateDirectory(directoryPath);
+            await File.WriteAllTextAsync(manifestFilePath, serializedManifest);
         }
 
 
