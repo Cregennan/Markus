@@ -13,6 +13,21 @@ namespace Markus.Processing
 {
     internal static class ParagraphProcessing
     {
+
+
+        internal enum ParagraphStylingProperties
+        {
+            Bold,
+            Italic,
+            Overline,
+            NoLeftIndent,
+            JustifyCenter,
+            JustifyLeft
+            
+        }
+
+
+
         /// <summary>
         /// Process all inlines. If instance of inline has child inlines itself, function will be recursively called for all of them.
         /// </summary>
@@ -29,9 +44,9 @@ namespace Markus.Processing
                 {
                     case LiteralInline literal:
                         {
-
+                            
                             currentRun
-                                .ApplyEmphasisEffects(currentInlineProperties) //Append bold and italic styles
+                                .ApplyRunEffects(currentInlineProperties) //Append bold and italic styles
                                 .AppendChild(new Text(literal.ToString()) { Space = SpaceProcessingModeValues.Preserve });
                             break;
                         }
@@ -122,8 +137,8 @@ namespace Markus.Processing
 
             List<object> effects = new List<object>();
 
-            if (isBold) effects.Add(new Bold());
-            if (isItalic) effects.Add(new Italic());
+            if (isBold) effects.Add(ParagraphStylingProperties.Bold);
+            if (isItalic) effects.Add(ParagraphStylingProperties.Bold);
 
             return effects.ToArray();
         }

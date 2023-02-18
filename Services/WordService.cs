@@ -1,6 +1,8 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Markus.Processing;
+using static Markus.Processing.ParagraphProcessing;
 using Drawing = DocumentFormat.OpenXml.Drawing;
 using DrawingPictures = DocumentFormat.OpenXml.Drawing.Pictures;
 using DrawingWordprocessing = DocumentFormat.OpenXml.Drawing.Wordprocessing;
@@ -170,7 +172,7 @@ namespace Markus.Services
         /// <param name="currentRun">Run which effect will be applied to</param>
         /// <param name="effects">List of effects</param>
         /// <returns></returns>
-        internal static Run ApplyEmphasisEffects(this Run currentRun, object[] effects)
+        internal static Run ApplyRunEffects(this Run currentRun, object[] effects)
         {
             currentRun.RunProperties ??= new RunProperties();
 
@@ -181,11 +183,11 @@ namespace Markus.Services
 
                     switch (effect)
                     {
-                        case Bold:
+                        case ParagraphStylingProperties.Bold:
                             currentRun.RunProperties.AppendChild(new Bold { Val = true });
                             break;
 
-                        case Italic:
+                        case ParagraphStylingProperties.Italic:
                             currentRun.RunProperties.AppendChild(new Italic { Val = true });
                             break;
 
@@ -195,6 +197,36 @@ namespace Markus.Services
             }
             
             return currentRun;
+        }
+
+        internal static Paragraph ApplyParagraphEffects(this Paragraph currentParagraph, object[] effects)
+        {
+            currentParagraph.ParagraphProperties ??= new ParagraphProperties();
+
+            if (effects is not null)
+            {
+                foreach(var effect in effects)
+                {
+                    switch (effect)
+                    {
+                        case ParagraphProcessing.ParagraphStylingProperties.NoLeftIndent:
+                            {
+                                Indentation indent = currentParagraph.ParagraphProperties.FindOrAppendNew<Indentation>();
+                                indent.Left = "0";
+                                break;
+                            }
+                        case ParagraphProcessing.ParagraphStylingProperties.JustifyLeft:
+                            {
+                                Justification j = currentParagraph.ParagraphProperties.FindOrAppendNew<Justification>();
+                                j.Val = JustificationValues.Left;
+
+                                break;
+                            }
+                        default: break;
+                    }
+                }
+            }
+            return currentParagraph;
         }
 
 

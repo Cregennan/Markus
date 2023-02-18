@@ -5,6 +5,7 @@ using Markdig;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using Markus.Processing;
+using MarkTables = Markdig.Extensions.Tables;
 
 namespace Markus.Services
 {
@@ -52,11 +53,6 @@ namespace Markus.Services
 
 
             MarkdownDocument document = Markdown.Parse(markdown, Pipeline);
-
-            foreach(var child in document.First().Descendants())
-            {
-                ConsoleService.ShowError(child);
-            }
 
             return document;
         }
@@ -128,6 +124,12 @@ namespace Markus.Services
                             break;
                         }
 
+                    case MarkTables.Table table:
+                        {
+                            TableProcessing.ProcessTable(table, document);
+
+                            break;
+                        }
                        
                     default:
                         //Message will be written if block is not implemented and app is in debug
