@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using DocumentFormat.OpenXml;
+using SixLabors.ImageSharp;
 
 namespace Markus.Services
 {
@@ -148,6 +149,9 @@ namespace Markus.Services
         
         }
 
-
+        internal static T FindOrAppendNew<T>(this OpenXmlCompositeElement element) where T: OpenXmlElement
+        {
+            return element.Elements<T>().FirstOrDefault() ?? element.AppendChild((T)System.Activator.CreateInstance(typeof(T))!)!;
+        }
     }
 }
