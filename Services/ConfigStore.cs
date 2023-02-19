@@ -10,23 +10,23 @@ namespace Markus.Services
 
         public Manifest Manifest { get; private set; }
 
-        public String CurrentTheme { get; private set; }
+        public String CurrentFolderPath { get; private set; }
 
-        private ConfigStore(Manifest manifest, String themePath)
+        private ConfigStore(Manifest manifest, String currentFolderPath)
         {
             this.Manifest = manifest;
-            this.CurrentTheme = themePath;
+            this.CurrentFolderPath = currentFolderPath;
         }
-
         public static ConfigStore Instance { get; private set; } = null;
 
-        public static ConfigStore Setup(Manifest manifest, String themePath)
+
+        public static ConfigStore Setup(Manifest manifest, String CurrentFolderPath)
         {
             if (Instance is not null)
             {
                 return Instance;
             }
-            Instance = new ConfigStore(manifest, themePath);
+            Instance = new ConfigStore(manifest, CurrentFolderPath);
             return Instance;
         }
 

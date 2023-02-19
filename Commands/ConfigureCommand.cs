@@ -69,7 +69,7 @@ namespace Markus.Commands
                 }
                 ConsoleService.ShowSuccess("Изменения сохранены");
 
-                ManifestService.SaveManifest(manifest, directoryPath, true);
+                await ManifestService.SaveManifest(manifest, directoryPath, true);
             }
             catch (ManifestNotFoundException)
             {
