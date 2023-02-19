@@ -36,11 +36,11 @@ namespace Markus.Commands
                 AnsiConsole.WriteLine($"Создаем проект {this._name}...");
             }
             
-            Manifest manifest = ConsoleService.RequestManifest(entryName);
-
             try
             {
                 string directoryPath = _path == null ? Environment.CurrentDirectory : Path.GetFullPath( _path );
+
+                Manifest manifest = ConsoleService.RequestManifest(entryName, directoryPath);
 
                 await ManifestService.SaveManifest(manifest, directoryPath, _force);
 

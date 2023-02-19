@@ -23,7 +23,6 @@ namespace Markus.Services
         /// <exception cref="MultipleManifestsException">Multiple project files found in folder</exception>
         public static String DetectManifestPath(string? manifestFolder)
         {
-            ConsoleService.DebugWarning(manifestFolder);
             if (Directory.Exists(manifestFolder))
             {
                 string[] paths = Directory.GetFiles(manifestFolder).Where(x => x.EndsWith(ManifestExtension)).ToArray();
@@ -84,8 +83,6 @@ namespace Markus.Services
 
             string manifestFilePath = Path.Combine(directoryPath, cleanedManifestName + ManifestExtension);
 
-            ConsoleService.DebugWarning("Путь создания манифеста: " + manifestFilePath);
-
             bool projectExists = true;
             string existingPath = String.Empty;
             try
@@ -108,7 +105,6 @@ namespace Markus.Services
                     throw new ManifestAlreadyExistsException();
                 }
             }
-
             Directory.CreateDirectory(directoryPath);
             await File.WriteAllTextAsync(manifestFilePath, serializedManifest);
         }
