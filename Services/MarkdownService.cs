@@ -4,6 +4,8 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Markdig;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Markus.MarkdigExtensions;
+using Markus.MarkdigExtensions.AutoInclude;
 using Markus.Processing;
 using MarkTables = Markdig.Extensions.Tables;
 
@@ -29,6 +31,7 @@ namespace Markus.Services
             Pipeline = new MarkdownPipelineBuilder()
                 .UseFootnotes()
                 .UseAdvancedExtensions()
+                .UseAutoInclude()
                 .Build();
 
         }
@@ -44,7 +47,7 @@ namespace Markus.Services
         {
 
             //This functionality is not implemented yet: recursive include_once like behaivor of markdown parser
-            if (recursive && processedPaths == null)
+            if (recursive && processedPaths is null)
             {
                 processedPaths = new HashSet<string>();
             }
@@ -64,7 +67,6 @@ namespace Markus.Services
 
             foreach (MarkdownObject block in blocks)
             {
-
                 switch (block)
                 {
                     

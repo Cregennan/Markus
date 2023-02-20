@@ -49,10 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="MarkdigExtensions\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Schemas\manifestSchema.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
