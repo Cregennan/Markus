@@ -27,6 +27,11 @@
       "type": "boolean",
       "default": true,
       "description": "Нумеровать заголовки (кроме специальных, вроде \"Приложение\", \"Введение\" и т.д."
+    },
+    "includeTitle": {
+      "type": "boolean",
+      "default": true,
+      "description": "Добавление титульника"
     }
 
   },

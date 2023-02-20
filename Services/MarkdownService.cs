@@ -4,6 +4,8 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Markdig;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Markus.MarkdigExtensions;
+using Markus.MarkdigExtensions.AutoInclude;
 using Markus.Processing;
 using MarkTables = Markdig.Extensions.Tables;
 
@@ -29,6 +31,7 @@ namespace Markus.Services
             Pipeline = new MarkdownPipelineBuilder()
                 .UseFootnotes()
                 .UseAdvancedExtensions()
+                .UseAutoInclude()
                 .Build();
 
         }
@@ -40,21 +43,55 @@ namespace Markus.Services
         /// <param name="recursive">Indicates to add all documents from </param>
         /// <param name="processedPaths"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<MarkdownObject>> GetMarkdownTokens(string filepath, bool recursive = false, HashSet<string>? processedPaths = null)
+        public static IEnumerable<MarkdownObject> GetMarkdownTokens(string filepath, bool recursive = false, HashSet<string>? processedPaths = null)
         {
 
-            //This functionality is not implemented yet: recursive include_once like behaivor of markdown parser
-            if (recursive && processedPaths == null)
+            //This will create a set of already processed paths to markdown files to prevent invinite recursive include.
+            if (processedPaths is null)
             {
                 processedPaths = new HashSet<string>();
             }
-
-            string markdown = await File.ReadAllTextAsync(filepath);
-
+            string markdown = File.ReadAllText(filepath);
 
             MarkdownDocument document = Markdown.Parse(markdown, Pipeline);
 
-            return document;
+            processedPaths.Add(filepath);
+
+            foreach (MarkdownObject token in document)
+            {
+                
+                if(token is not AutoIncludeBlock)
+                {
+                    yield return token;
+                    continue;
+                }
+
+                //If block is link to another file
+                if (!recursive)
+                {
+                    continue;
+                }
+
+                //If recursive mode is on
+
+                string filename = (token as AutoIncludeBlock).Filename.ToString();
+                string directoryPath = Path.GetDirectoryName(filepath)!;
+                string anotherFilePath = Path.Combine(directoryPath, filename + ".md");
+
+                if (!File.Exists(anotherFilePath))
+                    continue;
+                
+                //If this file was already processed
+                if (processedPaths!.Contains(anotherFilePath))
+                    continue;
+
+                processedPaths!.Add(anotherFilePath);
+
+                //Get all tokens from referenced file
+                foreach (MarkdownObject subToken in GetMarkdownTokens(anotherFilePath, true, processedPaths))
+                    yield return subToken;
+                
+            }
         }
 
         public static void ProcessBlocks(IEnumerable<MarkdownObject> blocks, WordprocessingDocument document, Paragraph currentParagraph = null, object[] blockProcesingOptions = null)
@@ -64,7 +101,6 @@ namespace Markus.Services
 
             foreach (MarkdownObject block in blocks)
             {
-
                 switch (block)
                 {
                     

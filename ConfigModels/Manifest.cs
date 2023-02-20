@@ -36,6 +36,14 @@ namespace Markus.Configmodels
         [JsonProperty("recursive", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public bool? Recursive { get; set; }
 
+
+        /// <summary>
+        /// Добавление титульной страницы
+        /// </summary>
+        [JsonProperty("includeTitle", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public bool? IncludeTitle { get; set; }
+
+
         /// <summary>
         /// Название файла с шаблоном оформления
         /// </summary>

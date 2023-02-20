@@ -93,7 +93,7 @@ namespace Markus.Services
         /// <param name="projectName"></param>
         /// <param name="quiet"></param>
         /// <returns>Manifest created from user choises</returns>
-        public static Manifest RequestManifest(string projectName, bool quiet = false)
+        public static Manifest RequestManifest(string projectName, string directoryPath)
         {
 
             string safeEntrypointName = ManifestService.PrepareManifestName(projectName);
@@ -105,61 +105,15 @@ namespace Markus.Services
             //Рекурсия или нет
             manifest.Recursive = false; //не реализовано
 
-            string themedefPath = Path.Combine(Utility.ApplicationPath, "Themes", "themeDefinitions.json");
-            string themedefText = File.ReadAllText(themedefPath);
-            Themes themes = JsonConvert.DeserializeObject<Themes>(themedefText);
-            List<ThemeData> themeData = themes.Definitions.Select(x =>
-            {
-                return new ThemeData
-                {
-                    Displayname = x.OutputText,
-                    Fullpath = Path.Combine(Utility.ApplicationPath, "Themes", $"{x.File}.dotm")
-                };
-            }).ToList();
-            string[] files = System.IO.Directory.GetFiles(Environment.CurrentDirectory, "*.dotm");
-            themeData.AddRange(files.Select(x =>
-            {
-                return new ThemeData
-                {
-                    Fullpath = x,
-                    Displayname = $"Шаблон пользователя: " + Path.GetFileName(x)
-                };
-            }));
-            var selected = AnsiConsole.Prompt(
-                new SelectionPrompt<String>()
-                .Title("Выберите тему для [green] данного проекта [/]")
-                .PageSize(10)
-                .AddChoices(themeData.Select(x => x.Displayname))
-            );
-            int index = themeData.Select(x => x.Displayname).ToList().IndexOf(selected);
-
-            if (!quiet)
-            AnsiConsole.MarkupLineInterpolated($"Используем [green]{Path.GetFileName(themeData[index].Fullpath)}[/] в качестве шаблона проекта");
-            
-            manifest.Template = Path.GetFileName(themeData[index].Fullpath);
-
-
-            string[] yesOrNo = new string[] { "Да", "Нет" };
-
-            var doNumbering = AnsiConsole.Prompt(
-                new SelectionPrompt<String>()
-                .Title("Пронумеровать ли заголовки?")
-                .AddChoices(yesOrNo)
-                ) == "Да";
-
-            if (!quiet)
-            AnsiConsole.MarkupLineInterpolated($"Принято, [green]{(doNumbering ? "" : "не ")}нумеруем[/] заголовки");
-
-            manifest.EnumerateHeadings = doNumbering;
+            manifest
+                .handleTemplate(directoryPath)
+                .handleEnumerateHeadings(directoryPath)
+                .handleIncludeTitle(directoryPath);
 
             return manifest;
         }
 
-        private struct ThemeData
-        {
-            public string Displayname;
-            public string Fullpath;
-        }
+        
 
 
 
