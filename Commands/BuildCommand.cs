@@ -92,7 +92,11 @@ namespace Markus.Commands
 
                 }
 
-                IEnumerable<MarkdownObject> tokens = await MarkdownService.GetMarkdownTokens(entrypointPath + ".md");
+                bool doAutoInclude = manifest.Recursive is true;
+
+                ConsoleService.DebugWarning("Включен Include_once");
+
+                IEnumerable<MarkdownObject> tokens = MarkdownService.GetMarkdownTokens(entrypointPath + ".md", doAutoInclude);
 
                 using (var document = WordprocessingDocument.CreateFromTemplate(selectedTemplatePath))
                 {

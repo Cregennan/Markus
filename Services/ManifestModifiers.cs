@@ -73,7 +73,6 @@ namespace Markus.Services
 
             return manifest;
         }
-
         internal static Manifest handleIncludeTitle(this Manifest manifest, string directoryPath)
         {
 
@@ -92,6 +91,20 @@ namespace Markus.Services
             return manifest;
 
         }
+        internal static Manifest handleRecursiveImport(this Manifest manifest, string directoryPath)
+        {
+            string[] yesOrNo = new string[] { "Да", "Нет" };
 
+            var recursive = AnsiConsole.Prompt(
+                new SelectionPrompt<String>()
+                .Title("Добавить части в основной файл?")
+                .AddChoices(yesOrNo)
+                ) == "Да";
+
+            manifest.Recursive = recursive;
+
+            return manifest;
+
+        }
     }
 }

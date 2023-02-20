@@ -13,10 +13,10 @@ namespace Markus.MarkdigExtensions.AutoInclude
     internal class AutoIncludeParser : BlockParser
     {
 
-        private readonly string _openingSequence = "@@[[";
+        private readonly string _openingSequence = "++[[";
         private readonly string _closingSequence = "]]";
 
-        private readonly char _openingCharacter = '@';
+        private readonly char _openingCharacter = '+';
         private readonly char _firstClosingCharacter = ']';
 
         public AutoIncludeParser() {
@@ -61,13 +61,11 @@ namespace Markus.MarkdigExtensions.AutoInclude
 
             StringBuilder sb = new StringBuilder();
 
-            if (c != _firstClosingCharacter)
+
+            while (c != _firstClosingCharacter)
             {
                 sb.Append(c);
-                while (c != _firstClosingCharacter)
-                {
-                    c = processor.NextChar();
-                }
+                c = processor.NextChar();
             }
             index = 0;
 

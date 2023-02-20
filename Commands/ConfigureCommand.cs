@@ -21,7 +21,8 @@ namespace Markus.Commands
         {
             { "Нумерация заголовков", "enumerateHeadings" },
             { "Используемый шаблон", "usedTemplate"  },
-            { "Добавление титульника", "includeTitle" }
+            { "Добавление титульника", "includeTitle" },
+            { "Добавление файлов по ссылке", "recursiveImport" }
         };
 
         private string _exitSelection = "> Выход";
@@ -32,6 +33,7 @@ namespace Markus.Commands
             _handlers.Add("usedTemplate", ManifestModifiers.handleTemplate);
             _handlers.Add("enumerateHeadings", ManifestModifiers.handleEnumerateHeadings);
             _handlers.Add("includeTitle", ManifestModifiers.handleIncludeTitle);
+            _handlers.Add("recursiveImport", ManifestModifiers.handleRecursiveImport);
         }
 
         public async Task Execute()
