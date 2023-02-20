@@ -46,29 +46,33 @@ namespace Markus.Services
         public static IEnumerable<MarkdownObject> GetMarkdownTokens(string filepath, bool recursive = false, HashSet<string>? processedPaths = null)
         {
 
-            //This functionality is not implemented yet: recursive include_once like behaivor of markdown parser
-            if (recursive && processedPaths is null)
-
-            processedPaths = new HashSet<string>();
-            
+            //This will create a set of already processed paths to markdown files to prevent invinite recursive include.
+            if (processedPaths is null)
+            {
+                processedPaths = new HashSet<string>();
+            }
             string markdown = File.ReadAllText(filepath);
 
             MarkdownDocument document = Markdown.Parse(markdown, Pipeline);
 
             processedPaths.Add(filepath);
 
-            foreach(MarkdownObject token in document)
+            foreach (MarkdownObject token in document)
             {
+                
                 if(token is not AutoIncludeBlock)
                 {
                     yield return token;
                     continue;
                 }
 
+                //If block is link to another file
                 if (!recursive)
                 {
                     continue;
                 }
+
+                //If recursive mode is on
 
                 string filename = (token as AutoIncludeBlock).Filename.ToString();
                 string directoryPath = Path.GetDirectoryName(filepath)!;
