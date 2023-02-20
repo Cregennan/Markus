@@ -10,7 +10,7 @@ namespace Markus.Processing
         public static void IncludeTitleIfManifestAllows(Manifest manifest, WordprocessingDocument document)
         {
             
-            if (!(bool)manifest.IncludeTitle!)
+            if (manifest.IncludeTitle is not true)
             {
                 return;
             }
