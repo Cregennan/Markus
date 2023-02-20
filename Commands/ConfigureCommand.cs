@@ -20,7 +20,8 @@ namespace Markus.Commands
         private Dictionary<string, string> _parameters = new Dictionary<string, string>
         {
             { "Нумерация заголовков", "enumerateHeadings" },
-            { "Используемый шаблон", "usedTemplate"  }
+            { "Используемый шаблон", "usedTemplate"  },
+            { "Добавление титульника", "includeTitle" }
         };
 
         private string _exitSelection = "> Выход";
@@ -30,6 +31,7 @@ namespace Markus.Commands
         {
             _handlers.Add("usedTemplate", ManifestModifiers.handleTemplate);
             _handlers.Add("enumerateHeadings", ManifestModifiers.handleEnumerateHeadings);
+            _handlers.Add("includeTitle", ManifestModifiers.handleIncludeTitle);
         }
 
         public async Task Execute()
@@ -41,6 +43,8 @@ namespace Markus.Commands
             try
             {
                 Manifest manifest = await ManifestService.GetManifest(directoryPath);
+
+                ConfigStore.Setup(manifest, directoryPath);
 
                 ConsoleService.ShowWarning("Редактирование проекта " + manifest.ProjectName);
 

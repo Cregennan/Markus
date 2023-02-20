@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Packaging;
 using Markdig.Syntax;
 using Markus.Configmodels;
 using Markus.Exceptions;
+using Markus.Processing;
 using Markus.Services;
 using Newtonsoft.Json;
 using Spectre.Console;
@@ -41,6 +42,7 @@ namespace Markus.Commands
                 if (!_quiet)
                     ConsoleService.ShowSuccess($"Собираем проект {manifest.ProjectName}...");
 
+                ConfigStore.Setup(manifest, directoryPath);
 
                 //TODO: Make --project parameter to manually select path where app will be executed
                 string entrypointPath = Path.Combine(directoryPath, manifest.Entrypoint);
@@ -90,13 +92,12 @@ namespace Markus.Commands
 
                 }
 
-                
-                ConfigStore.Setup(manifest, selectedTemplatePath);
                 IEnumerable<MarkdownObject> tokens = await MarkdownService.GetMarkdownTokens(entrypointPath + ".md");
 
                 using (var document = WordprocessingDocument.CreateFromTemplate(selectedTemplatePath))
                 {
 
+                    TitleProcessing.IncludeTitleIfManifestAllows(manifest, document);
                     MarkdownService.ProcessBlocks(tokens, document);
                     document.SaveAs(entrypointPath + ".docx");
 

@@ -20,7 +20,7 @@ namespace Markus.Services
 
         internal static Manifest handleTemplate(this Manifest manifest, string directoryPath)
         {
-            ConsoleService.ShowWarning("Изменение шаблона проекта");
+            //ConsoleService.ShowWarning("Изменение шаблона проекта");
 
             string themedefPath = Path.Combine(Utility.ApplicationPath, "Themes", "themeDefinitions.json");
             string themedefText = File.ReadAllText(themedefPath);
@@ -67,11 +67,30 @@ namespace Markus.Services
                 .AddChoices(yesOrNo)
                 ) == "Да";
             
-            AnsiConsole.MarkupLineInterpolated($"Принято, [green]{(doNumbering ? "" : "не ")}нумеруем[/] заголовки");
+            //AnsiConsole.MarkupLineInterpolated($"Принято, [green]{(doNumbering ? "" : "не ")}нумеруем[/] заголовки");
 
             manifest.EnumerateHeadings = doNumbering;
 
             return manifest;
+        }
+
+        internal static Manifest handleIncludeTitle(this Manifest manifest, string directoryPath)
+        {
+
+            string[] yesOrNo = new string[] { "Да", "Нет" };
+
+            var includeTitle = AnsiConsole.Prompt(
+                new SelectionPrompt<String>()
+                .Title("Добавить титульник?")
+                .AddChoices(yesOrNo)
+                ) == "Да";
+
+            //AnsiConsole.MarkupLineInterpolated($"Принято, [green]{(doNumbering ? "" : "не ")}нумеруем[/] заголовки");
+
+            manifest.IncludeTitle = includeTitle;
+
+            return manifest;
+
         }
 
     }

@@ -44,10 +44,9 @@ namespace Markus.Commands
 
                 await ManifestService.SaveManifest(manifest, directoryPath, _force);
 
-                
-
                 //Copy example files into new project folder
                 Directory.CreateDirectory(Path.Combine(directoryPath, "images"));
+
                 File.Copy(
                     Path.Combine(Utility.ApplicationPath, "Example", "alexanderPushnoy.jpg"),
                     Path.Combine(directoryPath, "images", "alexanderPushnoy.jpg")
@@ -57,6 +56,13 @@ namespace Markus.Commands
                     Path.Combine(Utility.ApplicationPath, "Example", "example.md"),
                     Path.Combine(directoryPath, $"{manifest.Entrypoint}.md")
                 );
+
+                File.Copy(
+                    Path.Combine(Utility.ApplicationPath, "Example", "Титульник.docx"),
+                    Path.Combine(directoryPath, "Титульник.docx")
+                    );
+
+
                 
                 if (!_quiet)
                 AnsiConsole.MarkupLineInterpolated($"[bold green] Проект {manifest.ProjectName} создан. Используйте [/] [dim green]`markus build`[/][bold green] для сборки проекта.[/]");

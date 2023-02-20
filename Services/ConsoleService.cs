@@ -105,7 +105,10 @@ namespace Markus.Services
             //Рекурсия или нет
             manifest.Recursive = false; //не реализовано
 
-            manifest.handleTemplate(directoryPath).handleEnumerateHeadings(directoryPath);
+            manifest
+                .handleTemplate(directoryPath)
+                .handleEnumerateHeadings(directoryPath)
+                .handleIncludeTitle(directoryPath);
 
             return manifest;
         }
