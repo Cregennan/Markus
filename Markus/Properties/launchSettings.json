@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "Markus": {
+      "commandName": "Project"
+    },
+    "build": {
+      "commandName": "Project",
+      "commandLineArgs": "build",
+      "workingDirectory": "C:\\Users\\Cregennan\\source\\repos\\Cregennan\\Markus\\TestFolder"
+    },
+    "new Another": {
+      "commandName": "Project",
+      "commandLineArgs": "new \"Another\" --path \"Another\"",
+      "workingDirectory": "C:\\Users\\Cregennan\\source\\repos\\Cregennan\\Markus\\TestFolder"
+    },
+    "config": {
+      "commandName": "Project",
+      "commandLineArgs": "config",
+      "workingDirectory": "C:\\Users\\Cregennan\\source\\repos\\Cregennan\\Markus\\TestFolder"
+    }
+  }
+}
