@@ -102,13 +102,11 @@ namespace Markus.Services
             manifest.ProjectName = projectName;
             manifest.Entrypoint = safeEntrypointName;
 
-            //Рекурсия или нет
-            manifest.Recursive = false; //не реализовано
-
             manifest
                 .handleTemplate(directoryPath)
                 .handleEnumerateHeadings(directoryPath)
-                .handleIncludeTitle(directoryPath);
+                .handleIncludeTitle(directoryPath)
+                .handleRecursiveImport(directoryPath);
 
             return manifest;
         }
