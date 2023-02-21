@@ -24,7 +24,7 @@ jobs:
       - name: Сборка решения
         run: dotnet build --configuration Release --no-restore
       - name: Упаковка решения
-        run: dotnet publish -c release -r win10-x64 --self-contained /p:publishsinglefile=true /p:publishdir "./output/"
+        run: dotnet publish -c release -r win10-x64 --self-contained /p:publishsinglefile=true /p:publishdir="./output/"
       - uses: vimtor/action-zip@v1
         with:
           files: output/
